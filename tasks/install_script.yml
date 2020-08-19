@@ -1,0 +1,16 @@
+---
+- name: "Upload script {{ script }}"
+  copy:
+    dest: "{{ libvirt_script_src_dir }}/{{ script }}"
+    src: "{{ script }}"
+    owner: root
+    group: root
+    mode: 0755
+
+- name: "Add script {{ script }} to path"
+  file:
+    src: "{{ libvirt_script_src_dir }}/{{ script }}"
+    dest: "/usr/local/bin/{{ script | regex_replace('^(.*)\\.[^./]*$', '\\1') }}"
+    owner: root
+    group: root
+    state: link

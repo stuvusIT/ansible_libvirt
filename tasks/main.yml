@@ -1,0 +1,8 @@
+---
+- import_tasks: install.yml
+
+- name: Define domains
+  include_tasks: define_domain.yml
+  loop: "{{ libvirt_domains }}"
+  loop_control:
+    loop_var: libvirt_domain

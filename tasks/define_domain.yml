@@ -1,0 +1,20 @@
+---
+- name: "Define domain {{ name }}"
+  copy:
+    dest: "{{ libvirt_domain_definition_dir }}/{{ name }}.json"
+    content: "{{ libvirt_domain.definition | to_nice_json }} "
+    owner: root
+    group: root
+    mode: 0644
+  vars:
+    name: "{{ (libvirt_domain.definition.content|selectattr('name', 'equalto', 'name')|first).content | mandatory }}"
+  register: dom_def
+
+- name: "Apply domain definition for {{ name }}"
+  command:
+    argv:
+      - define_dom_from_json
+      - "{{ libvirt_domain_definition_dir }}/{{ name }}.json"
+  vars:
+    name: "{{ (libvirt_domain.definition.content|selectattr('name', 'equalto', 'name')|first).content | mandatory }}"
+  when: dom_def.changed

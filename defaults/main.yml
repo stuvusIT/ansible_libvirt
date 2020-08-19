@@ -1,0 +1,5 @@
+---
+libvirt_script_src_dir: /usr/local/src/libvirt_ansible_role
+libvirt_configuration_dir: /etc/libvirt_ansible_role
+libvirt_domain_definition_dir: /etc/libvirt_ansible_role/domains
+libvirt_domains: []
