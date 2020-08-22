@@ -1,6 +1,5 @@
 ---
-- name: Enable and restart libvirt-daemon
+- name: Restart libvirt-daemon
   service:
     name: libvirtd
     state: restarted
-    enabled: yes

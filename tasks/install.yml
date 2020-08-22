@@ -7,7 +7,7 @@
       - libvirt-clients
       - python3-libvirt
   notify:
-    - Enable and restart libvirt-daemon
+    - Restart libvirt-daemon
 
 - name: Add export of libvirt default uri to /etc/profile.d
   copy:
