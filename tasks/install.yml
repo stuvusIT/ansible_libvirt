@@ -1,0 +1,38 @@
+---
+- name: Install requirements, libvirt and tools
+  apt:
+    pkg:
+      - qemu-kvm
+      - libvirt-daemon-system
+      - libvirt-clients
+      - python3-libvirt
+  notify:
+    - Restart libvirt-daemon
+
+- name: Add export of libvirt default uri to /etc/profile.d
+  copy:
+    dest: /etc/profile.d/10-libvirt-default-uri.sh
+    content: export LIBVIRT_DEFAULT_URI="qemu:///system"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Create necessarry directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  loop:
+    - "{{ libvirt_configuration_dir }}"
+    - "{{ libvirt_domain_definition_dir }}"
+    - "{{ libvirt_script_src_dir }}"
+
+- name: Install scripts
+  include_tasks: install_script.yml
+  loop:
+    - json_to_xml.py
+    - define_dom_from_json.py
+  loop_control:
+    loop_var: script

@@ -1,0 +1,16 @@
+---
+- import_tasks: install.yml
+
+- meta: flush_handlers
+
+- name: Enable libvirt-daemon
+  service:
+    name: libvirtd
+    enabled: True
+    state: started
+
+- name: Define domains
+  include_tasks: define_domain.yml
+  loop: "{{ libvirt_domains }}"
+  loop_control:
+    loop_var: libvirt_domain
