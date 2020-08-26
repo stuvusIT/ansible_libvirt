@@ -13,19 +13,20 @@ It is intended to only use the `qemu://system` daemon.
 
 ## Role Variables
 
-| Name                            |           Required/Default            | Description                                                                                           |
-| ------------------------------- | :-----------------------------------: | ----------------------------------------------------------------------------------------------------- |
-| `libvirt_script_src_dir`        | `/usr/local/src/libvirt_ansible_role` | The directory where the role places the scripts needed by the role.                                   |
-| `libvirt_configuration_dir`     |      `/etc/libvirt_ansible_role`      | The directory where the role places some configuration files.                                         |
-| `libvirt_domain_definition_dir` |  `/etc/libvirt_ansible_role/domains`  | The directory where the role places the definitions for the domains before loading them into libvirt. |
-| `libvirt_domains`               |                 `[]`                  | A list of domains to define. Each entry in the list should be a [DomainDict](#domain-dict).           |
+| Name                            |           Required/Default            | Description                                                                                                                                      |
+| ------------------------------- | :-----------------------------------: | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `libvirt_script_src_dir`        | `/usr/local/src/libvirt_ansible_role` | The directory where the role places the scripts needed by the role.                                                                              |
+| `libvirt_configuration_dir`     |      `/etc/libvirt_ansible_role`      | The directory where the role places some configuration files.                                                                                    |
+| `libvirt_domain_definition_dir` |  `/etc/libvirt_ansible_role/domains`  | The directory where the role places the definitions for the domains before loading them into libvirt as well as the extra files for each domain. |
+| `libvirt_domains`               |                 `[]`                  | A list of domains to define. Each entry in the list should be a [DomainDict](#domain-dict).                                                      |
 
 
 ## Domain dict
 Each domain is defined by a dict with following keys:
-| Name         | Required/Default | Description                                                                                                                                                                                                                                            |
-| ------------ | :--------------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `definition` |     required     | The definition of the domain. This must have the [Xml description format](#xml-description-format) as it will be converted to xml. The contents of the xml must be according to the [libvirt domain xml format](https://libvirt.org/formatdomain.html) |
+| Name          | Required/Default | Description                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------- | :--------------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `definition`  |     required     | The definition of the domain. This must have the [Xml description format](#xml-description-format) as it will be converted to xml. The contents of the xml must be according to the [libvirt domain xml format](https://libvirt.org/formatdomain.html)                                                                                                                                                                        |
+| `extra_files` |       `[]`       | A list of files to be put on the hypervisor in the subdirectory of `libvirt_domain_definition_dir` for this domain. Each item should be a dict containing the keys and values as expected by the [copy module](https://docs.ansible.com/ansible/latest/modules/copy_module.html). The value of [dest](https://docs.ansible.com/ansible/latest/modules/copy_module.html) will be prepended with the above mentioned directory. |
 
 For the role to properly process the domain, the [name element](https://libvirt.org/formatdomain.html#general-metadata) must exist and have content. This name should be unique.
 
@@ -33,18 +34,26 @@ For the role to properly process the domain, the [name element](https://libvirt.
 With this format it is possible to describe an xml document in json/yaml.
 Each xml element is a dict with these keys:
 
-| Name    | Required/Default |              Type              | Description                                                                   |
-| ------- | :--------------: | :----------------------------: | ----------------------------------------------------------------------------- |
-| name    |     required     |             string             | The name of the xml element                                                   |
-| attrs   |     optional     |    dict, with string values    | Rhe attributes of the xml element                                             |
-| content |     optional     | string, number or list of xml elements | The string in the element (number is converted to stirng) or a list of xml elements contained inside this one |
+| Name    | Required/Default |                  Type                  | Description                                                                                                   |
+| ------- | :--------------: | :------------------------------------: | ------------------------------------------------------------------------------------------------------------- |
+| name    |     required     |                 string                 | The name of the xml element                                                                                   |
+| attrs   |     optional     |        dict, with string values        | The attributes of the xml element                                                                             |
+| content |     optional     | string, number or list of xml elements | The string in the element (number is converted to string) or a list of xml elements contained inside this one |
 
 
 ## Example
 
 ```yml
 libvirt_domains:
-  - definition:
+  - extra_files:
+      - dest: initialInstallationArgs.txt
+        content: |
+          expectedRootDiskAt=/storage/vms/mydomain.qcow2
+          initialIpAddr=192.168.10.107
+      - dest: foo
+        content: bar
+        mode: 600
+    definition:
       name: domain
       attrs:
         type: kvm
