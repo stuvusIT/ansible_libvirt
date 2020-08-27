@@ -49,7 +49,10 @@ libvirt_domains:
       - dest: initialInstallationArgs.txt
         content: |
           expectedRootDiskAt=/storage/vms/mydomain.qcow2
-          initialIpAddr=192.168.10.107
+      - dest: initialBootArgs.txt
+        content: |
+          address=192.168.10.107
+          prefixLen=24
       - dest: foo
         content: bar
         mode: 600
